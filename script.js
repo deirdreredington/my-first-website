@@ -1,39 +1,78 @@
-// Mobile navigation menu
+// Smooth scrolling for navigation links
+document.querySelectorAll('a[href^="#"]').forEach(link => {
+  link.addEventListener("click", function (e) {
+    const targetId = this.getAttribute("href");
 
-const menuButton = document.querySelector(".menu-button");
-const closeButton = document.querySelector(".close-menu");
-const mobileMenu = document.querySelector(".mobile-menu");
-const mobileLinks = document.querySelectorAll(".mobile-menu a");
+    if (targetId === "#") return;
 
-if (menuButton && mobileMenu) {
-    menuButton.addEventListener("click", () => {
-        mobileMenu.classList.add("active");
-        mobileMenu.setAttribute("aria-hidden", "false");
-        menuButton.setAttribute("aria-expanded", "true");
-    });
-}
+    const target = document.querySelector(targetId);
 
-if (closeButton && mobileMenu) {
-    closeButton.addEventListener("click", () => {
-        mobileMenu.classList.remove("active");
-        mobileMenu.setAttribute("aria-hidden", "true");
-        menuButton.setAttribute("aria-expanded", "false");
-    });
-}
+    if (target) {
+      e.preventDefault();
 
-mobileLinks.forEach((link) => {
-    link.addEventListener("click", () => {
-        mobileMenu.classList.remove("active");
-        mobileMenu.setAttribute("aria-hidden", "true");
-        menuButton.setAttribute("aria-expanded", "false");
-    });
+      target.scrollIntoView({
+        behavior: "smooth"
+      });
+    }
+  });
 });
 
 
-// Automatically display the current year in the footer
+// Project filtering
+const filters = document.querySelectorAll(".project-filters span");
+const projects = document.querySelectorAll(".project");
 
-const year = document.getElementById("current-year");
+filters.forEach(filter => {
+  filter.addEventListener("click", () => {
+    const category = filter.textContent.toLowerCase();
 
-if (year) {
-    year.textContent = new Date().getFullYear();
-}
+    filters.forEach(item => item.classList.remove("active"));
+    filter.classList.add("active");
+
+    projects.forEach(project => {
+      const projectText = project.textContent.toLowerCase();
+
+      if (
+        category === "all" ||
+        projectText.includes(category)
+      ) {
+        project.style.display = "block";
+      } else {
+        project.style.display = "none";
+      }
+    });
+  });
+});
+
+
+// Fade projects in as you scroll
+const observer = new IntersectionObserver(
+  entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("show");
+      }
+    });
+  },
+  {
+    threshold: 0.15
+  }
+);
+
+document
+  .querySelectorAll(".project, .about, .experience, .contact")
+  .forEach(section => {
+    observer.observe(section);
+  });
+
+
+// Change header slightly when scrolling
+const header = document.querySelector(".header");
+
+window.addEventListener("scroll", () => {
+  if (window.scrollY > 50) {
+    header.classList.add("scrolled");
+  } else {
+    header.classList.remove("scrolled");
+  }
+});
